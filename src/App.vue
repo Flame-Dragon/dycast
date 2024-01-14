@@ -1,14 +1,16 @@
 <template>
   <div class="main">
-    <Left class="left" />
-    <Right class="right" />
+    <Main class="left" />
+    <Iframe />
   </div>
 </template>
 
 <script setup lang="ts">
-import Left from './components/Left.vue';
-import Right from './components/Right.vue';
+import Main from './components/Left.vue';
+import Iframe from './components/Iframe.vue';
+
 import { ref, reactive, provide, readonly } from 'vue';
+
 
 /**
  * 输出标签
@@ -72,7 +74,15 @@ provide('setIsStopScroll', (value: boolean) => {
     width: 45%;
   }
   .right {
-    width: 55%;
+    width: 90%;
+  }
+  .iframe {
+    width :55%;
+    iframe {
+      width: 100%;
+      height: 80%;
+      border: none;
+    }
   }
 }
 @media screen and (max-width: 768px) {
@@ -86,6 +96,13 @@ provide('setIsStopScroll', (value: boolean) => {
     }
     .mess-c {
       height: 640px;
+    }
+    .iframe {
+      iframe {
+        width: 100%;
+        height: 80%;
+        border: none;
+      }
     }
   }
 }

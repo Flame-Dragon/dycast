@@ -52,6 +52,7 @@
         </div>
       </div>
     </div>
+    <Right class="right" />
   </div>
 </template>
 
@@ -59,6 +60,9 @@
 import { DyClient, handleMessage } from '../utils/client';
 import { getRoomInfoApi } from '@/api/commonApi';
 import { ref, inject, onMounted, type Ref } from 'vue';
+import Right from './Right.vue';
+import eventBus from '@/utils/event';
+
 
 // 房间号
 const roomNum = ref<string | null>(null);
@@ -68,6 +72,8 @@ const relayWs = ref<string>('');
 const chatList = inject<Mess[]>('chatList');
 // 点赞送礼榜
 const rankList = inject<RankItem[]>('rankList');
+
+const newMessage = inject<any[]>('message')
 
 // 连接状态
 const connectCode = ref<number>(100);
@@ -117,9 +123,9 @@ function gotoConnect() {
     return;
   }
   rnFlag.value = false;
-  let n = window.open(`https://live.douyin.com/${roomNum.value}`, '_blank');
+  // let n = window.open(`https://live.douyin.com/${roomNum.value}`, '_blank');
   setTimeout(() => {
-    n?.close();
+    // n?.close();
     roomNum.value &&
       getRoomInfoApi(roomNum.value)
         .then((res: any) => {
@@ -162,6 +168,10 @@ function connection(roomId: string, uniqueId: string) {
     if (message) {
       let m = handleMessage(message);
       handleChat(m);
+      if(m.type === 'chat') {
+        console.log(m)
+        eventBus.emit('message', m)
+      }
       renewPos();
       relayMess(m);
     }
@@ -185,24 +195,24 @@ function handleChat(data: Mess) {
     case 'chat':
       chatList!.push(data);
       break;
-    case 'member':
-      memberCount.value = data.memberCount;
-      break;
-    case 'like':
-      likeCount.value = data.likeCount;
-      break;
-    case 'gift':
-      chatList!.push(data);
-      break;
-    case 'social':
-      followCount.value = data.followCount;
-      break;
-    case 'room':
-      memberCount.value = data.memberCount;
-      totalUserCount.value = data.totalUserCount;
-      rankList!.length = 0;
-      rankList!.push(...data.rank);
-      break;
+    // case 'member':
+    //   memberCount.value = data.memberCount;
+    //   break;
+    // case 'like':
+    //   likeCount.value = data.likeCount;
+    //   break;
+    // case 'gift':
+    //   chatList!.push(data);
+    //   break;
+    // case 'social':
+    //   followCount.value = data.followCount;
+    //   break;
+    // case 'room':
+    //   memberCount.value = data.memberCount;
+    //   totalUserCount.value = data.totalUserCount;
+    //   rankList!.length = 0;
+    //   rankList!.push(...data.rank);
+    //   break;
   }
 }
 
@@ -233,7 +243,7 @@ function relayMess(data: Mess) {
 <style lang="less" scoped>
 .dy-form {
   width: 100%;
-  height: 100%;
+  // height: 100%;
   box-sizing: border-box;
   display: flex;
   padding: 24px 36px;

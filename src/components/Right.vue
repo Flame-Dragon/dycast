@@ -99,6 +99,8 @@ function onStopScrollOfList() {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
+  width: 100%;
   .mess-box {
     position: relative;
     border-radius: 8px;
