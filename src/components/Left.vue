@@ -5,16 +5,27 @@
       <div
         class="dy-room-box"
         :class="{
-          error: rnFlag
-        }">
+          error: rnFlag,
+        }"
+      >
         <div class="dy-room-tag">房间号</div>
-        <input v-model="roomNum" type="text" class="dy-room-input" placeholder="请输入12位房间号" />
+        <input
+          v-model="roomNum"
+          type="text"
+          class="dy-room-input"
+          placeholder="请输入12位房间号"
+        />
         <button class="dy-room-btn" @click="gotoConnect">连接</button>
       </div>
       <div class="dy-title">转发信息</div>
       <div class="dy-room-box">
         <div class="dy-room-tag">ws地址</div>
-        <input v-model="relayWs" type="text" class="dy-room-input" placeholder="请输入ws/wss协议链接" />
+        <input
+          v-model="relayWs"
+          type="text"
+          class="dy-room-input"
+          placeholder="请输入ws/wss协议链接"
+        />
         <button class="dy-room-btn" @click="relay">转发</button>
       </div>
       <div class="dy-title">
@@ -24,9 +35,9 @@
           class="state"
           :class="{
             success: connectCode === 200,
-            fail: connectCode === 400
+            fail: connectCode === 400,
           }"
-          >{{ connectCode === 200 ? '连接成功' : '连接失败' }}</span
+          >{{ connectCode === 200 ? "连接成功" : "连接失败" }}</span
         >
       </div>
       <div class="dy-room-info" v-if="connectCode !== 100">
@@ -57,72 +68,71 @@
 </template>
 
 <script setup lang="ts">
-import { DyClient, handleMessage } from '../utils/client';
-import { getRoomInfoApi } from '@/api/commonApi';
-import { ref, inject, onMounted, type Ref } from 'vue';
-import Right from './Right.vue';
-import eventBus from '@/utils/event';
-
+import { DyClient, handleMessage } from "../utils/client"
+import { getRoomInfoApi } from "@/api/commonApi"
+import { ref, inject, onMounted, type Ref } from "vue"
+import Right from "./Right.vue"
+import eventBus from "@/utils/event"
 
 // 房间号
-const roomNum = ref<string | null>(null);
+const roomNum = ref<string | null>("700192154570")
 
-const relayWs = ref<string>('');
+const relayWs = ref<string>("")
 // 弹幕列表
-const chatList = inject<Mess[]>('chatList');
+const chatList = inject<Mess[]>("chatList")
 // 点赞送礼榜
-const rankList = inject<RankItem[]>('rankList');
+const rankList = inject<RankItem[]>("rankList")
 
-const newMessage = inject<any[]>('message')
+const newMessage = inject<any[]>("message")
 
 // 连接状态
-const connectCode = ref<number>(100);
-const roomAvatar = ref<string>('');
-const roomTitle = ref<string | null>(null);
+const connectCode = ref<number>(100)
+const roomAvatar = ref<string>("")
+const roomTitle = ref<string | null>(null)
 
-const isStopScroll = inject<Ref<boolean>>('isStopScroll');
-const setIsStopScroll = inject<(value: boolean) => void>('setIsStopScroll');
+const isStopScroll = inject<Ref<boolean>>("isStopScroll")
+const setIsStopScroll = inject<(value: boolean) => void>("setIsStopScroll")
 
-const rnFlag = ref(false);
+const rnFlag = ref(false)
 /**
  * 在线观众
  */
-const memberCount = ref(0);
+const memberCount = ref(0)
 /**
  * 点赞数
  */
-const likeCount = ref(0);
+const likeCount = ref(0)
 /**
  * 主播粉丝数
  */
-const followCount = ref(0);
+const followCount = ref(0)
 /**
  * 累计观看人数
  */
-const totalUserCount = ref(0);
+const totalUserCount = ref(0)
 
 // 传送的socket
-let relaySocket: any;
+let relaySocket: any
 // 消息列表DOM
-let messListDom: HTMLElement | null;
+let messListDom: HTMLElement | null
 
 onMounted(() => {
-  messListDom = document.getElementById('mess-list');
-});
+  messListDom = document.getElementById("mess-list")
+})
 
 /**
  * 连接直播间
  */
 function gotoConnect() {
   if (!roomNum.value) {
-    rnFlag.value = true;
-    return;
+    rnFlag.value = true
+    return
   }
   if (!/\d{8,12}/.test(roomNum.value)) {
-    rnFlag.value = true;
-    return;
+    rnFlag.value = true
+    return
   }
-  rnFlag.value = false;
+  rnFlag.value = false
   // let n = window.open(`https://live.douyin.com/${roomNum.value}`, '_blank');
   setTimeout(() => {
     // n?.close();
@@ -130,26 +140,28 @@ function gotoConnect() {
       getRoomInfoApi(roomNum.value)
         .then((res: any) => {
           // console.log(res);
-          roomAvatar.value = res.avatar;
-          roomTitle.value = res.roomTitle;
+          roomAvatar.value = res.avatar
+          roomTitle.value = res.roomTitle
           if (!res.roomId || !res.uniqueId) {
             // 房间ID和uniqueID获取失败
-            connectCode.value = 400;
+            connectCode.value = 400
           } else {
-            connection(res.roomId, res.uniqueId);
+            connection(res.roomId, res.uniqueId)
           }
         })
         .catch((err: any) => {
-          console.error(err);
-        });
-  }, 2000);
+          console.error(err)
+        })
+  }, 2000)
 }
+
+gotoConnect()
 
 /**
  * 转发消息
  */
 function relay() {
-  relaySocket = new WebSocket(relayWs.value);
+  relaySocket = new WebSocket(relayWs.value)
 }
 
 /**
@@ -158,31 +170,31 @@ function relay() {
  * @param uniqueId
  */
 function connection(roomId: string, uniqueId: string) {
-  let sign = window.getSign(roomId, uniqueId)['X-Bogus'];
-  let now = Date.now();
-  let wsUrl = `wss://webcast3-ws-web-hl.douyin.com/webcast/im/push/v2/?app_name=douyin_web&version_code=180800&webcast_sdk_version=1.3.0&update_version_code=1.3.0&compress=gzip&internal_ext=internal_src:dim|wss_push_room_id:${roomId}|wss_push_did:${uniqueId}|fetch_time:${now}|seq:1|wss_info:0-${now}-0-0&cursor=t-${now}_r-1_d-1_u-1_h-1&host=https://live.douyin.com&aid=6383&live_id=1&did_rule=3&debug=false&maxCacheMessageNumber=20&endpoint=live_pc&support_wrds=1&im_path=/webcast/im/fetch/&user_unique_id=${uniqueId}&device_platform=web&cookie_enabled=true&screen_width=1920&screen_height=1080&browser_language=zh-CN&browser_platform=Win32&browser_name=Mozilla&browser_version=5.0%20(Windows%20NT%2010.0;%20Win64;%20x64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/111.0.0.0%20Safari/537.36%20Edg/111.0.1661.62&browser_online=true&tz_name=Asia/Shanghai&identity=audience&room_id=${roomId}&heartbeatDuration=0&signature=${sign}`;
+  let sign = window.getSign(roomId, uniqueId)["X-Bogus"]
+  let now = Date.now()
+  let wsUrl = `wss://webcast3-ws-web-hl.douyin.com/webcast/im/push/v2/?app_name=douyin_web&version_code=180800&webcast_sdk_version=1.3.0&update_version_code=1.3.0&compress=gzip&internal_ext=internal_src:dim|wss_push_room_id:${roomId}|wss_push_did:${uniqueId}|fetch_time:${now}|seq:1|wss_info:0-${now}-0-0&cursor=t-${now}_r-1_d-1_u-1_h-1&host=https://live.douyin.com&aid=6383&live_id=1&did_rule=3&debug=false&maxCacheMessageNumber=20&endpoint=live_pc&support_wrds=1&im_path=/webcast/im/fetch/&user_unique_id=${uniqueId}&device_platform=web&cookie_enabled=true&screen_width=1920&screen_height=1080&browser_language=zh-CN&browser_platform=Win32&browser_name=Mozilla&browser_version=5.0%20(Windows%20NT%2010.0;%20Win64;%20x64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/111.0.0.0%20Safari/537.36%20Edg/111.0.1661.62&browser_online=true&tz_name=Asia/Shanghai&identity=audience&room_id=${roomId}&heartbeatDuration=0&signature=${sign}`
   // 服务地址 发送
-  const client = new DyClient();
-  client.init(wsUrl);
+  const client = new DyClient()
+  client.init(wsUrl)
   client.accept = (message: proto.Message) => {
     if (message) {
-      let m = handleMessage(message);
-      handleChat(m);
-      if(m.type === 'chat') {
+      let m = handleMessage(message)
+      handleChat(m)
+      if (m.type === "chat") {
         console.log(m)
-        eventBus.emit('message', m)
+        eventBus.emit("message", m)
       }
-      renewPos();
-      relayMess(m);
+      renewPos()
+      relayMess(m)
     }
-  };
+  }
   client.onOff = (flag: boolean) => {
     if (flag) {
-      connectCode.value = 200;
+      connectCode.value = 200
     } else {
-      connectCode.value = 400;
+      connectCode.value = 400
     }
-  };
+  }
 }
 
 /**
@@ -190,11 +202,11 @@ function connection(roomId: string, uniqueId: string) {
  * @param chat
  */
 function handleChat(data: Mess) {
-  let type = data.type;
+  let type = data.type
   switch (type) {
-    case 'chat':
-      chatList!.push(data);
-      break;
+    case "chat":
+      chatList!.push(data)
+      break
     // case 'member':
     //   memberCount.value = data.memberCount;
     //   break;
@@ -221,12 +233,15 @@ function handleChat(data: Mess) {
  */
 function renewPos() {
   if (!messListDom) {
-    messListDom = document.getElementById('mess-list');
+    messListDom = document.getElementById("mess-list")
   }
   // console.log(isStopScroll?.value);
   if (!isStopScroll?.value) {
     messListDom &&
-      messListDom.scrollTo({ top: messListDom.scrollHeight - messListDom.clientHeight, behavior: 'smooth' });
+      messListDom.scrollTo({
+        top: messListDom.scrollHeight - messListDom.clientHeight,
+        behavior: "smooth",
+      })
   }
 }
 
@@ -235,8 +250,8 @@ function renewPos() {
  * @param data
  */
 function relayMess(data: Mess) {
-  if (!data.type) return;
-  relaySocket && relaySocket?.send(JSON.stringify(data));
+  if (!data.type) return
+  relaySocket && relaySocket?.send(JSON.stringify(data))
 }
 </script>
 

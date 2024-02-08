@@ -10,13 +10,19 @@
         <div class="mess-h-t">弹幕消息</div>
       </div>
       <div class="mess-c">
-        <dynamic-scroller :items="chatList" :min-item-size="32" class="mess-l" id="mess-list">
+        <dynamic-scroller
+          :items="chatList"
+          :min-item-size="32"
+          class="mess-l"
+          id="mess-list"
+        >
           <template v-slot="{ item, index, active }">
             <dynamic-scroller-item
               :item="item"
               :active="active"
               :size-dependencies="[item.content]"
-              :data-index="item.id">
+              :data-index="item.id"
+            >
               <div class="mess-l-item">
                 <div class="item-name">{{ item.nickname }}</div>
                 <div class="item-content-box">
@@ -24,7 +30,7 @@
                     v-if="getChatType(item.type) === 0"
                     :class="{
                       in: item.type === 'member',
-                      text: item.type === 'chat'
+                      text: item.type === 'chat',
                     }"
                     >{{ item.content }}</span
                   >
@@ -40,7 +46,11 @@
         </dynamic-scroller>
       </div>
       <!-- 返回底部盒子 -->
-      <div v-if="isStopScroll && chatList!.length > 0" class="rt-bt-box" @click.stop="returnBottom">
+      <div
+        v-if="isStopScroll && chatList!.length > 0"
+        class="rt-bt-box"
+        @click.stop="returnBottom"
+      >
         <span>固定底部</span>
         <span class="icon">︾</span>
       </div>
@@ -49,48 +59,52 @@
 </template>
 
 <script setup lang="ts">
-import { inject, type Ref } from 'vue';
+import { inject, type Ref } from "vue"
 
-const chatList = inject<Mess[]>('chatList');
+const chatList = inject<Mess[]>("chatList")
 
-const isStopScroll = inject<Ref<boolean>>('isStopScroll');
-const setIsStopScroll = inject<(value: boolean) => void>('setIsStopScroll');
+const isStopScroll = inject<Ref<boolean>>("isStopScroll")
+const setIsStopScroll = inject<(value: boolean) => void>("setIsStopScroll")
 
 /**
  * 获取信息类型
  * @param type
  */
 function getChatType(type: string): number {
-  let f = 0;
+  let f = 0
   switch (type) {
-    case 'member':
-      f = 0;
-      break;
-    case 'chat':
-      f = 0;
-      break;
-    case 'gift':
-      f = 1;
-      break;
+    case "member":
+      f = 0
+      break
+    case "chat":
+      f = 0
+      break
+    case "gift":
+      f = 1
+      break
   }
-  return f;
+  return f
 }
 
 /**
  * 返回底部
  */
 function returnBottom() {
-  setIsStopScroll && setIsStopScroll(false);
-  const messListDom = document.getElementById('mess-list');
-  messListDom && messListDom.scrollTo({ top: messListDom.scrollHeight - messListDom.clientHeight, behavior: 'smooth' });
+  setIsStopScroll && setIsStopScroll(false)
+  const messListDom = document.getElementById("mess-list")
+  messListDom &&
+    messListDom.scrollTo({
+      top: messListDom.scrollHeight - messListDom.clientHeight,
+      behavior: "smooth",
+    })
 }
 
 /**
  * 点击停止自动滚动
  */
 function onStopScrollOfList() {
-  if (chatList!.length <= 0) return;
-  setIsStopScroll && setIsStopScroll(true);
+  if (chatList!.length <= 0) return
+  setIsStopScroll && setIsStopScroll(true)
 }
 </script>
 
@@ -190,11 +204,11 @@ function onStopScrollOfList() {
       color: #b148c6;
       line-height: 32px;
       &::before {
-        content: '[';
+        content: "[";
         margin-right: 5px;
       }
       &::after {
-        content: ']: ';
+        content: "]: ";
         margin-left: 5px;
       }
     }
@@ -231,7 +245,7 @@ function onStopScrollOfList() {
     &::before {
       font-weight: bold;
       margin: 5px 8px;
-      content: '$';
+      content: "$";
       color: #14a800;
       font-size: 18px;
     }

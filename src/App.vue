@@ -6,11 +6,10 @@
 </template>
 
 <script setup lang="ts">
-import Main from './components/Left.vue';
-import Iframe from './components/Iframe.vue';
+import Main from "./components/Left.vue"
+import Iframe from "./components/Iframe.vue"
 
-import { ref, reactive, provide, readonly } from 'vue';
-
+import { ref, reactive, provide, readonly } from "vue"
 
 /**
  * 输出标签
@@ -19,16 +18,16 @@ import { ref, reactive, provide, readonly } from 'vue';
  * @param color
  */
 const printInfo = function (
-  tip: string = '抖音弹幕姬',
-  link: string = 'https://github.com/skmcj/dycast',
-  color: string = '#dc6b82'
+  tip: string = "抖音弹幕姬",
+  link: string = "https://github.com/skmcj/dycast",
+  color: string = "#dc6b82"
 ) {
   console.log(
     `%c ${tip} %c ${link}`,
     `color:white;background:${color};padding:5px 0;border-radius: 5px 0 0 5px;`,
     `padding:4px;border:1px solid ${color};border-radius: 0 5px 5px 0;`
-  );
-};
+  )
+}
 
 const printSKMCJ = function () {
   const info = `
@@ -40,28 +39,28 @@ const printSKMCJ = function () {
     ____\\_\\  \\ \\__\\\\ \\__\\ \\__\\    \\ \\__\\ \\_______\\ \\________\\
    |\\_________\\|__| \\|__|\\|__|     \\|__|\\|_______|\\|________|
    \\|_________|
-  `;
-  console.log(`%c${info}`, `color: #dc6b82`);
-};
+  `
+  console.log(`%c${info}`, `color: #dc6b82`)
+}
 setTimeout(() => {
-  console.clear();
-  printSKMCJ();
-  printInfo();
-}, 1500);
+  console.clear()
+  printSKMCJ()
+  printInfo()
+}, 1500)
 
 // 弹幕表
-const chatList = reactive<Mess[]>([]);
+const chatList = reactive<Mess[]>([])
 // 点赞送礼榜
-const rankList = reactive<RankItem[]>([]);
+const rankList = reactive<RankItem[]>([])
 // 是否停止自动滚动
-const isStopScroll = ref(false);
+const isStopScroll = ref(false)
 
-provide('chatList', chatList);
-provide('rankList', rankList);
-provide('isStopScroll', readonly(isStopScroll));
-provide('setIsStopScroll', (value: boolean) => {
-  isStopScroll.value = value;
-});
+provide("chatList", chatList)
+provide("rankList", rankList)
+provide("isStopScroll", readonly(isStopScroll))
+provide("setIsStopScroll", (value: boolean) => {
+  isStopScroll.value = value
+})
 </script>
 
 <style lang="less">
@@ -77,10 +76,10 @@ provide('setIsStopScroll', (value: boolean) => {
     width: 90%;
   }
   .iframe {
-    width :55%;
+    width: 55%;
     iframe {
       width: 100%;
-      height: 80%;
+      height: 100%;
       border: none;
     }
   }
